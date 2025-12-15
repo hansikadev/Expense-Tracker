@@ -10,7 +10,7 @@ app.use(cors());
 
 
 //api routes
-app.use('/ap/v2/expense',expenseroutes)
+app.use('/api/v2/expense',expenseroutes)
 
 module.exports=app;
 

@@ -5,12 +5,14 @@ import SpendingChart from './components/Spendingchart.jsx';
 import CategoryChart from './components/CategoryChart.jsx';
 import Transactionlist from './components/Transactionlist.jsx';
 import Model from './components/Model.jsx';
+import { useState, useEffect } from 'react';
+
 
 import { fetchExpenses, createExpenses, updateExpenses, deleteExpenses } from './api.js';
 
 function App() {
   const [expenses, setExpenses] = react.useState([]);
-
+  const [loading, setLoading] = react.useState(false);
   //stats calculations
   const calculationsStats = (expenseList) => {
     const list = expenseList || [];
@@ -31,6 +33,26 @@ function App() {
   }
   const stats = calculationsStats(expenses);
 
+  //load initial data
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true)
+      try{
+        const [expData]=await Promise.all([fetchExpenses()]);
+        const normalized=(expData || []).map((e)=>({
+          ...e, date:e?.date ? String(e.date).split("T")[0] : new Date().toISOString().split("T")[0],
+        }));
+        setExpenses(normalized);  
+      }
+      catch(error){
+        console.error("Error loading expenses:",error);
+      }
+      finally{
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-gray-50 to-slate-10">

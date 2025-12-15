@@ -27,10 +27,10 @@ const expenseSchema=new mongoose.Schema({
 },
     { timestamps:true}
 );
-expenseSchema.pre('save',function(next){
-    if(this.amount) this.amout=Math.round(this.amount*100)/100;
-    next();
-});
+// expenseSchema.pre('save',function(next){
+//     if(this.amount ) this.amount=Math.round(this.amount*100)/100;
+//     next();
+// });
 
 const Expense=mongoose.model('CopyExpense',expenseSchema);
 module.exports=Expense;
