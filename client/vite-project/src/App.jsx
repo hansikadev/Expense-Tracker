@@ -11,8 +11,13 @@ import { useState, useEffect } from 'react';
 import { fetchExpenses, createExpenses, updateExpenses, deleteExpenses } from './api.js';
 
 function App() {
-  const [expenses, setExpenses] = react.useState([]);
-  const [loading, setLoading] = react.useState(false);
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isModeOpen,setIsModelOpen]=useState(false);
+  const [editingExpense,setEditingExpense]=useState(null);
+  const [searchTerm,setSearchTerm]=useState('');
+  const [filterCategory,setFilterCategory]=useState('All');
+
   //stats calculations
   const calculationsStats = (expenseList) => {
     const list = expenseList || [];
@@ -53,6 +58,56 @@ function App() {
     }
     load();
   }, []);
+
+  //add edit and delete functions
+  const handleAddExpense=async(payload)=>{
+    try{
+      const created=await createExpenses(payload);
+      if(!created) throw new error("Failed to create expense");
+      setExpenses((prev)=>[
+        {...created, date :created.date("T")[0]},
+        ...prev,
+      ]);
+      setIsModelOpen(false);
+    }
+    catch(error){
+      console.error("Error adding expense:",error);
+    } 
+  }
+
+  const onEdit=(expense)=>{
+    setEditingExpense(expense);
+    setIsModelOpen(true);
+  }
+
+
+  const handlleSaveEdit=async(payload)=>{
+    if(!editingExpense) return;
+    try{
+      const updated=await updateExpenses(editingExpense._id,payload);
+      if(!updated) throw new error("Failed to update expense");
+      setExpenses((prev)=>prev.map((e)=>e.id===updated._id ? {...updated, date:updated.date.split("T")[0]} : e));
+      setEditingExpense(null);
+      setIsModelOpen(false);
+    } 
+    catch(error){
+      console.error("Error updating expense:",error);
+    }
+  }
+
+  const handleDelete=async(id)=>{
+    if(!window.confirm("Delete this expense")) return;
+
+    try{
+      await deleteExpenses(id);
+      // const deleted=await deleteExpenses(id);
+      // if(!deleted) throw new error("Failed to delete expense");
+      // setExpenses((prev)=>prev.filter((e)=>e._id !== id));
+    }
+    catch(error){
+      console.error("Error deleting expense:",error);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-gray-50 to-slate-10">
