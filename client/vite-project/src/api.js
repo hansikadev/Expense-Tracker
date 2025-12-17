@@ -10,9 +10,9 @@ export const fetchExpenses=async()=>{
     return ( res.data  && res.data.data) || [];   
 }
 
-export const createExpenses=async()=>{
-    const res=await api.post('/expense');
-    return ( res.data  && res.data.data) || [];   
+export const createExpenses=async(payload)=>{
+    const res=await api.post('/expense', payload);
+    return (res.data && res.data.data) || null;
 }
 
 export const updateExpenses=async(id,payload)=>{

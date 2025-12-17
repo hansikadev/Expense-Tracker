@@ -4,8 +4,8 @@ import { X } from "lucide-react";
 function AddExpense({ onClose, onSave, editingExpense }) {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
-  const [date, setDate] = useState("");
-  const [category, setCategory] = useState("Bills");
+  const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [category, setCategory] = useState("Food");
   const [note, setNote] = useState("");
 
   // Prefill form if editingExpense exists
@@ -115,19 +115,31 @@ function AddExpense({ onClose, onSave, editingExpense }) {
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             Category
           </label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200
-                       focus:outline-none focus:ring-2 focus:ring-indigo-500
-                       text-sm bg-white"
-          >
-            <option>Food</option>
-            <option>Transport</option>
-            <option>Shopping</option>
-            <option>Bills</option>
-            <option>Entertainment</option>
-          </select>
+          <div className="flex flex-wrap gap-3">
+            {[
+              "Food",
+              "Transport",
+              "Shopping",
+              "Bills",
+              "Entertainment",
+              "Healthcare",
+              "Other",
+            ].map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setCategory(cat)}
+                className={
+                  "px-3 py-1.5 rounded-full text-sm font-medium transition-shadow focus:outline-none " +
+                  (category === cat
+                    ? "bg-indigo-600 text-white shadow-md"
+                    : "bg-gray-100 text-gray-700 hover:shadow-sm")
+                }
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Note */}
@@ -147,19 +159,17 @@ function AddExpense({ onClose, onSave, editingExpense }) {
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-3">
+        <div className="flex items-center gap-3">
           <button
             onClick={handleSave}
-            className="flex-1 bg-gray-800 text-white py-3 rounded-xl
-                       font-semibold hover:bg-gray-900 transition"
+            className="flex-1 bg-gray-800 text-white py-3 rounded-xl font-semibold hover:bg-gray-900 transition"
           >
             {editingExpense ? "Save Changes" : "Add Expense"}
           </button>
 
           <button
             onClick={onClose}
-            className="flex-1 bg-gray-300 text-gray-800 py-3 rounded-xl
-                       font-semibold hover:bg-gray-400 transition"
+            className="w-28 border border-gray-300 text-gray-800 py-2 rounded-xl font-semibold hover:bg-gray-50 transition"
           >
             Cancel
           </button>
@@ -170,10 +180,5 @@ function AddExpense({ onClose, onSave, editingExpense }) {
 }
 
 export default AddExpense;
-
-export const createExpenses = async (payload) => {
-  const res = await api.post('/expense', payload);
-  return (res.data && res.data.data) || null;
-}
 
 
