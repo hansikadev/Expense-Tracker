@@ -102,7 +102,14 @@ function App() {
     try {
       const updated = await updateExpenses(editingExpense.id, payload);
       if (!updated) throw new Error("Failed to update expense");
-      setExpenses((prev) => prev.map((e) => e.id === updated.id ? { ...updated, date: updated.date.split("T")[0] } : e));
+
+      const normalized = {
+        ...updated,
+        id: updated._id || updated.id,
+        date: updated.date ? updated.date.split("T")[0] : updated.date,
+      };
+
+      setExpenses((prev) => prev.map((e) => (e.id === (updated._id || updated.id) ? normalized : e)));
       setEditingExpense(null);
       setIsModelOpen(false);
     }
@@ -190,3 +197,5 @@ function App() {
 }
 
 export default App;
+
+

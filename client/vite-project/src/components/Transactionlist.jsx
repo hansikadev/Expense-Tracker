@@ -1,4 +1,5 @@
 
+
 import React from "react";
 import { Search, Receipt, Edit2, Trash2 } from "lucide-react";
 
@@ -11,18 +12,25 @@ function Transactionlist({
   filterCategory,
   setFilterCategory
 }) {
-
-  const categories = ["Food", "Transportation", "Entertainment", "Shopping", "Bills", "Healthcare", "Others"];
+  const categories = [
+    "Food",
+    "Transport",
+    "Entertainment",
+    "Shopping",
+    "Bills",
+    "Healthcare",
+    "Others"
+  ];
 
   const getcategorycolor = (category) => {
     const colors = {
-      Food: '#10B981',
-      Transportation: '#3B82F6',
+      Food: "#10B981",
+      Transport: "#3B82F6",
       Entertainment: "#8B5CF6",
-      Shopping: '#EC4899',
-      Bills: '#F59E0B',
-      Healthcare: '#EF4444',
-      Others: '#6B7280',
+      Shopping: "#EC4899",
+      Bills: "#F59E0B",
+      Healthcare: "#EF4444",
+      Others: "#6B7280",
     };
     return colors[category] || colors.Others;
   };
@@ -32,31 +40,36 @@ function Transactionlist({
       String(expense.description || "")
         .toLowerCase()
         .includes((searchTerm || "").toLowerCase()) ||
-      (expense.notes && expense.notes.toLowerCase().includes((searchTerm || "").toLowerCase()));
+      String(expense.note || expense.notes || "")
+        .toLowerCase()
+        .includes((searchTerm || "").toLowerCase());
 
-    const matchesCategory = filterCategory === 'All' || expense.category === filterCategory;
+    const matchesCategory =
+      filterCategory === "All" || expense.category === filterCategory;
+
     return matchesSearch && matchesCategory;
   });
 
-
-
   return (
     <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-
       {/* Header */}
-      <div className="flex items-center  justify-between mb-6">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-xl font-bold text-gray-900">Transactions</h3>
-          <p className="text-sm text-gray-500 mt-1">{filteredExpenses.length} Total</p>
+          <p className="text-sm text-gray-500 mt-1">
+            {filteredExpenses.length} Total
+          </p>
         </div>
         <div className="px-4 py-2 bg-gray-700 text-white rounded-full text-sm font-bold">
-          {/*i will use logic  */}
-          ${filteredExpenses.reduce((sum, e) => sum + Number(e.amount || 0), 0).toFixed(2)}
+          ₹
+          {filteredExpenses
+            .reduce((sum, e) => sum + Number(e.amount || 0), 0)
+            .toFixed(2)}
         </div>
       </div>
 
       {/* Search + Filter */}
-      <div className="flex gap-3  mb-6">
+      <div className="flex gap-3 mb-6">
         <div className="flex-1 relative">
           <Search className="absolute left-3.5 top-3.5 w-4.5 h-4.5 text-gray-400" />
           <input
@@ -68,7 +81,11 @@ function Transactionlist({
           />
         </div>
 
-        <select className="border-2 bg-gray-50 border-gray-200 rounded-xl py-3 px-4 text-sm font-semibold text-gray-700 focus:outline-none cursor-pointer focus:border-indigo-500" value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+        <select
+          className="border-2 bg-gray-50 border-gray-200 rounded-xl py-3 px-4 text-sm font-semibold text-gray-700 focus:outline-none cursor-pointer focus:border-indigo-500"
+          value={filterCategory}
+          onChange={(e) => setFilterCategory(e.target.value)}
+        >
           <option value="All">All</option>
           {categories.map((cat) => (
             <option value={cat} key={cat}>
@@ -78,32 +95,35 @@ function Transactionlist({
         </select>
       </div>
 
-
+      {/* List */}
       <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
-        {/* conditional rendering */}
-
         {filteredExpenses.length === 0 ? (
-          <div className="text-center  text-gray-500 py-16">
+          <div className="text-center text-gray-500 py-16">
             <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Receipt className="w-10 h-10 text-gray-400" />
             </div>
             <p className="text-gray-600 font-semibold">No transactions found</p>
-            <p className="text-sm text-gray-400 mt-1">Try different filters</p>
+            <p className="text-sm text-gray-400 mt-1">
+              Try different filters
+            </p>
           </div>
-        )  : (
+        ) : (
           filteredExpenses.map((expense) => (
             <div
               key={expense.id}
-              className="flex items-center gap-4 flex-1 min-w-0 p-4 bg-linear-to-r from-gray-100 to-white hover:from-white hover:to-gray-50 border-2 border-gray-100 transition-all group rounded-xl"
+              className="flex items-center gap-4 p-4 bg-linear-to-r from-gray-100 to-white hover:from-white hover:to-gray-50 border-2 border-gray-100 transition-all group rounded-xl"
             >
               <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center shrink-0 shadow-sm">
                 <div
                   className="w-2.5 h-2.5 rounded-full"
-                  style={{ backgroundColor: getcategorycolor(expense.category) }}
+                  style={{
+                    backgroundColor: getcategorycolor(expense.category),
+                  }}
                 />
               </div>
 
               <div className="min-w-0 flex-1">
+                {/* ✅ TITLE FIX */}
                 <h4 className="font-bold text-gray-900 truncate">
                   {expense.description}
                 </h4>
@@ -113,9 +133,18 @@ function Transactionlist({
                     {expense.category}
                   </span>
                   <span className="text-gray-400">·</span>
-                  <span className="text-gray-500 font-medium">{expense.date}</span>
-                  <span className="text-gray-400">·</span>
-                  <span className="text-gray-500 truncate">{expense.notes}</span>
+                  <span className="text-gray-500 font-medium">
+                    {expense.date}
+                  </span>
+
+                  {(expense.note || expense.notes) && (
+                    <>
+                      <span className="text-gray-400">·</span>
+                      <span className="text-gray-500 truncate">
+                        {expense.note || expense.notes}
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -143,14 +172,147 @@ function Transactionlist({
             </div>
           ))
         )}
-
-
       </div>
-
     </div>
-
   );
 }
-
+ 
 export default Transactionlist;
 
+
+// import React from "react";
+// import { Search, Receipt, Edit2, Trash2 } from "lucide-react";
+
+// function Transactionlist({
+//   expenses,
+//   onDelete,
+//   onEdit,
+//   searchTerm,
+//   setSearchTerm,
+//   filterCategory,
+//   setFilterCategory,
+// }) {
+//   const categories = [
+//     "Food",
+//     "Transport",
+//     "Entertainment",
+//     "Shopping",
+//     "Bills",
+//     "Healthcare",
+//     "Others",
+//   ];
+
+//   const getCategoryColor = (category) => {
+//     const colors = {
+//       Food: "#10B981",
+//       Transport: "#3B82F6",
+//       Entertainment: "#8B5CF6",
+//       Shopping: "#EC4899",
+//       Bills: "#F59E0B",
+//       Healthcare: "#EF4444",
+//       Others: "#6B7280",
+//     };
+//     return colors[category] || colors.Others;
+//   };
+
+//   const filteredExpenses = (expenses || []).filter((expense) => {
+//     const matchesSearch =
+//       expense.description
+//         ?.toLowerCase()
+//         .includes(searchTerm.toLowerCase()) ||
+//       expense.note?.toLowerCase().includes(searchTerm.toLowerCase());
+
+//     const matchesCategory =
+//       filterCategory === "All" || expense.category === filterCategory;
+
+//     return matchesSearch && matchesCategory;
+//   });
+
+//   return (
+//     <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+//       {/* Header */}
+//       <div className="flex items-center justify-between mb-6">
+//         <div>
+//           <h3 className="text-xl font-bold text-gray-900">Transactions</h3>
+//           <p className="text-sm text-gray-500 mt-1">
+//             {filteredExpenses.length} Total
+//           </p>
+//         </div>
+//         <div className="px-4 py-2 bg-gray-700 text-white rounded-full text-sm font-bold">
+//           ₹
+//           {filteredExpenses
+//             .reduce((sum, e) => sum + Number(e.amount || 0), 0)
+//             .toFixed(2)}
+//         </div>
+//       </div>
+
+//       {/* Search + Filter */}
+//       <div className="flex gap-3 mb-6">
+//         <div className="flex-1 relative">
+//           <Search className="absolute left-3.5 top-3.5 w-4.5 h-4.5 text-gray-400" />
+//           <input
+//             value={searchTerm}
+//             onChange={(e) => setSearchTerm(e.target.value)}
+//             type="text"
+//             placeholder="Search"
+//             className="w-full pl-10 pr-4 py-3 border-2 bg-gray-50 border-gray-200 rounded-xl text-sm"
+//           />
+//         </div>
+
+//         <select
+//           value={filterCategory}
+//           onChange={(e) => setFilterCategory(e.target.value)}
+//           className="border-2 bg-gray-50 border-gray-200 rounded-xl py-3 px-4 text-sm font-semibold"
+//         >
+//           <option value="All">All</option>
+//           {categories.map((cat) => (
+//             <option value={cat} key={cat}>
+//               {cat}
+//             </option>
+//           ))}
+//         </select>
+//       </div>
+
+//       {/* List */}
+//       <div className="space-y-3 max-h-96 overflow-y-auto">
+//         {filteredExpenses.length === 0 ? (
+//           <div className="text-center text-gray-500 py-16">
+//             <Receipt className="mx-auto mb-4 w-10 h-10" />
+//             <p>No transactions found</p>
+//           </div>
+//         ) : (
+//           filteredExpenses.map((expense) => (
+//             <div
+//               key={expense.id}
+//               className="flex items-center gap-4 p-4 border rounded-xl"
+//             >
+//               <div
+//                 className="w-3 h-3 rounded-full"
+//                 style={{ backgroundColor: getCategoryColor(expense.category) }}
+//               />
+
+//               <div className="flex-1">
+//                 <h4 className="font-bold">{expense.description}</h4>
+//                 <p className="text-xs text-gray-500">
+//                   {expense.category} · {expense.date} · {expense.note}
+//                 </p>
+//               </div>
+
+//               <span className="font-bold">₹{expense.amount}</span>
+
+//               <button onClick={() => onEdit(expense)}>
+//                 <Edit2 size={16} />
+//               </button>
+
+//               <button onClick={() => onDelete(expense.id)}>
+//                 <Trash2 size={16} />
+//               </button>
+//             </div>
+//           ))
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default Transactionlist;
