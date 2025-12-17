@@ -1,5 +1,4 @@
-import react from 'react'
-import { Cat, Plus,Wallet ,ShoppingCart,TrendingUp,DollarSign} from 'lucide-react';
+import { Cat, Plus, Wallet, ShoppingCart, TrendingUp, DollarSign } from 'lucide-react';
 import StatCard from './components/StatCard.jsx';
 import SpendingChart from './components/Spendingchart.jsx';
 import CategoryChart from './components/CategoryChart.jsx';
@@ -13,10 +12,10 @@ import { fetchExpenses, createExpenses, updateExpenses, deleteExpenses } from '.
 function App() {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isModeOpen,setIsModelOpen]=useState(false);
-  const [editingExpense,setEditingExpense]=useState(null);
-  const [searchTerm,setSearchTerm]=useState('');
-  const [filterCategory,setFilterCategory]=useState('All');
+  const [isModeOpen, setIsModelOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState('All');
 
   //stats calculations
   const calculationsStats = (expenseList) => {
@@ -26,7 +25,7 @@ function App() {
     const categoryTotal = list.reduce((acc, e) => {
       acc[e.category] = (acc[e.category] || 0) + Number(e.amount || 0);
       return acc;
-    },{})
+    }, {})
 
     return {
       total,
@@ -38,21 +37,34 @@ function App() {
   }
   const stats = calculationsStats(expenses);
 
+  const handleDeleteExpense = async (id) => {
+    if (!window.confirm("Delete this expense?")) return;
+
+    try {
+      await deleteExpenses(id);
+      setExpenses((prev) => prev.filter((e) => e.id !== id));
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+    }
+  };
+
   //load initial data
   useEffect(() => {
     const load = async () => {
       setLoading(true)
-      try{
-        const [expData]=await Promise.all([fetchExpenses()]);
-        const normalized=(expData || []).map((e)=>({
-          ...e, date:e?.date ? String(e.date).split("T")[0] : new Date().toISOString().split("T")[0],
+      try {
+        const [expData] = await Promise.all([fetchExpenses()]);
+        const normalized = (expData || []).map((e) => ({
+          ...e,
+          id: e._id,
+          date: e?.date ? String(e.date).split("T")[0] : new Date().toISOString().split("T")[0],
         }));
-        setExpenses(normalized);  
+        setExpenses(normalized);
       }
-      catch(error){
-        console.error("Error loading expenses:",error);
+      catch (error) {
+        console.error("Error loading expenses:", error);
       }
-      finally{
+      finally {
         setLoading(false);
       }
     }
@@ -60,54 +72,58 @@ function App() {
   }, []);
 
   //add edit and delete functions
-  const handleAddExpense=async(payload)=>{
-    try{
-      const created=await createExpenses(payload);
-      if(!created) throw new error("Failed to create expense");
-      setExpenses((prev)=>[
-        {...created, date :created.date("T")[0]},
+  const handleAddExpense = async (payload) => {
+    try {
+      const created = await createExpenses(payload);
+      if (!created) throw new Error("Failed to create expense");
+      setExpenses((prev) => [
+        {
+          ...created,
+          id: created._id,
+          date: created.date.split("T")[0]
+        },
         ...prev,
       ]);
       setIsModelOpen(false);
     }
-    catch(error){
-      console.error("Error adding expense:",error);
-    } 
+    catch (error) {
+      console.error("Error adding expense:", error);
+    }
   }
 
-  const onEdit=(expense)=>{
+  const onEdit = (expense) => {
     setEditingExpense(expense);
     setIsModelOpen(true);
   }
 
 
-  const handlleSaveEdit=async(payload)=>{
-    if(!editingExpense) return;
-    try{
-      const updated=await updateExpenses(editingExpense._id,payload);
-      if(!updated) throw new error("Failed to update expense");
-      setExpenses((prev)=>prev.map((e)=>e.id===updated._id ? {...updated, date:updated.date.split("T")[0]} : e));
+  const handleSaveEdit = async (payload) => {
+    if (!editingExpense) return;
+    try {
+      const updated = await updateExpenses(editingExpense.id, payload);
+      if (!updated) throw new Error("Failed to update expense");
+      setExpenses((prev) => prev.map((e) => e.id === updated.id ? { ...updated, date: updated.date.split("T")[0] } : e));
       setEditingExpense(null);
       setIsModelOpen(false);
-    } 
-    catch(error){
-      console.error("Error updating expense:",error);
+    }
+    catch (error) {
+      console.error("Error updating expense:", error);
     }
   }
 
-  const handleDelete=async(id)=>{
-    if(!window.confirm("Delete this expense")) return;
+  // const handleDelete = async (id) => {
+  //   if (!window.confirm("Delete this expense")) return;
 
-    try{
-      await deleteExpenses(id);
-      // const deleted=await deleteExpenses(id);
-      // if(!deleted) throw new error("Failed to delete expense");
-      // setExpenses((prev)=>prev.filter((e)=>e._id !== id));
-    }
-    catch(error){
-      console.error("Error deleting expense:",error);
-    }
-  }
+  //   try {
+  //     await deleteExpenses(id);
+  //     // const deleted=await deleteExpenses(id);
+  //     // if(!deleted) throw new error("Failed to delete expense");
+  //     // setExpenses((prev)=>prev.filter((e)=>e._id !== id));
+  //   }
+  //   catch (error) {
+  //     console.error("Error deleting expense:", error);
+  //   }
+  // }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-gray-50 to-slate-10">
@@ -118,7 +134,7 @@ function App() {
             <p className='text-gray-700'>Manage your finance with ease</p>
           </div>
           <div className='flex items-center gap-3'>
-            <button className=' text-white gap-2 px-4 py-2 rounded-xl bg-gray-600 transition-all font-semibold hover:shadow-2xl flex items-center'>
+            <button onClick={() => setIsModelOpen(true)} className=' text-white gap-2 px-4 py-2 rounded-xl bg-gray-600 transition-all font-semibold hover:shadow-2xl flex items-center'>
               <Plus className='w-4 h-4' /> Add Expense
             </button>
           </div>
@@ -138,7 +154,7 @@ function App() {
         {/* charts */}
         <div className='grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8'>
           <div className='lg:col-span-3'>
-            <SpendingChart expenses={expenses}/>
+            <SpendingChart expenses={expenses} />
           </div>
 
           <div className='lg:col-span-2'>
@@ -146,9 +162,9 @@ function App() {
           </div>
         </div>
         {/* transaction list */}
-        <Transactionlist 
+        <Transactionlist
           expenses={expenses}
-          onDelete={handleDelete}
+          onDelete={handleDeleteExpense}
           onEdit={onEdit}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -158,7 +174,17 @@ function App() {
       </div>
 
       {/* model */}
-      {/* <Model/> */}
+      {isModeOpen && (
+        <Model
+          onClose={() => {
+            setIsModelOpen(false);
+            setEditingExpense(null);
+          }}
+          onSave={editingExpense ? handleSaveEdit : handleAddExpense}
+          editingExpense={editingExpense}
+        />
+      )}
+
     </div>
   )
 }
