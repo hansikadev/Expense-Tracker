@@ -17,9 +17,10 @@ function SpendingChart({expenses}) {
       })
       const total=dayExpenses.reduce((sum,e)=>sum+Number(e.amount || 0),0);
       
-      return {date: new Date(date).toLocaleDateString('en-US',{weekday:'short'}),amount:
-        parseFloat(total.toFixed(2) )
-        };
+      return {
+        date: new Date(date).toLocaleDateString('en-US',{weekday:'short'}),
+        amount:parseFloat(total.toFixed(2) )
+      };
     });
   
 

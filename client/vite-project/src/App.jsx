@@ -142,11 +142,19 @@ function App() {
           </div>
 
           <div className='lg:col-span-2'>
-            <CategoryChart />
+            <CategoryChart categoryTotal={stats.categoryTotal} />
           </div>
         </div>
         {/* transaction list */}
-        <Transactionlist />
+        <Transactionlist 
+          expenses={expenses}
+          onDelete={handleDelete}
+          onEdit={onEdit}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          filterCategory={filterCategory}
+          setFilterCategory={setFilterCategory}
+        />
       </div>
 
       {/* model */}
