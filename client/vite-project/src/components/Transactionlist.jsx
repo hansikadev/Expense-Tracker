@@ -36,19 +36,20 @@ function Transactionlist({
   };
 
   const filteredExpenses = (expenses || []).filter((expense) => {
+    const search = (searchTerm || "").toLowerCase();
+
     const matchesSearch =
-      String(expense.description || "")
-        .toLowerCase()
-        .includes((searchTerm || "").toLowerCase()) ||
-      String(expense.note || expense.notes || "")
-        .toLowerCase()
-        .includes((searchTerm || "").toLowerCase());
+      expense.description?.toLowerCase().includes(search) ||
+      expense.note?.toLowerCase().includes(search) ||
+      expense.notes?.toLowerCase().includes(search) ||
+      expense.category?.toLowerCase().includes(search); // ✅ CATEGORY SEARCH ADDED
 
     const matchesCategory =
       filterCategory === "All" || expense.category === filterCategory;
 
     return matchesSearch && matchesCategory;
   });
+
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
@@ -176,7 +177,7 @@ function Transactionlist({
     </div>
   );
 }
- 
+
 export default Transactionlist;
 
 
