@@ -7,7 +7,7 @@ const connectDB=require('./config/db');
 connectDB();
 
 
-const port=process.env.PORT || 8001;
+const port=process.env.FRONTEND_URL || 8000;
 const server=app.listen(port,()=>{
     console.log('server is running on port',port);
 })
