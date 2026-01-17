@@ -1,6 +1,8 @@
 import axios from "axios"
 
-const BASE_URL =import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/api/v2";
+const BASE_URL =
+  import.meta.env.VITE_BACKEND_URL ||
+  "https://expense-tracker-wjwt.onrender.com/api/v2";
 
 const api=axios.create({baseURL:BASE_URL,timeout:8000});
 
